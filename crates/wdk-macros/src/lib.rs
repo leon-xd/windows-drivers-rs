@@ -1299,7 +1299,7 @@ mod tests {
 
                 let expected = Error::new(
                     Span::call_site(),
-                    "Failed to find \"_WDFFUNCENUM\" module in types.rs file",
+                    "Failed to find _WDFFUNCENUM module in types.rs file",
                 );
 
                 pretty_assert_eq!(
@@ -1323,7 +1323,7 @@ mod tests {
 
                 let expected = Error::new(
                     Span::call_site(),
-                    "Failed to find \"_WDFFUNCENUM\" module contents in types.rs file",
+                    "Failed to find _WDFFUNCENUM module contents in types.rs file",
                 );
 
                 pretty_assert_eq!(
