@@ -6,12 +6,14 @@
 
 use std::{collections::BTreeMap, path::PathBuf, str::FromStr};
 
+use fs4::fs_std::FileExt;
 use itertools::Itertools;
 use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};
-use quote::{format_ident, quote};
+use quote::{format_ident, quote, ToTokens};
+use serde::{Deserialize, Serialize};
 use syn::{
-    parse::{Parse, ParseStream},
+    parse::{Parse, ParseStream, Parser},
     parse2,
     parse_file,
     parse_quote,
