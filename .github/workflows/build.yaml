@@ -38,9 +38,6 @@ jobs:
           - aarch64-pc-windows-msvc
 
     steps:
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -48,6 +45,9 @@ jobs:
         uses: ./.github/actions/winget-install
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
 
       - name: Install LLVM ${{ matrix.llvm }}
         run: |
