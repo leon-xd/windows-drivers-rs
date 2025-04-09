@@ -38,6 +38,9 @@ jobs:
           - aarch64-pc-windows-msvc
 
     steps:
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        
       - name: Checkout Repository
         uses: actions/checkout@v4
 
