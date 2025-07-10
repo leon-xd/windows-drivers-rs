@@ -1,7 +1,13 @@
 // Copyright (c) Microsoft Corporation
 // License: MIT OR Apache-2.0
 
-use wdk_sys::{call_unsafe_wdf_function_binding, NTSTATUS, WDFSPINLOCK, WDF_OBJECT_ATTRIBUTES};
+use wdk_sys::{
+    call_unsafe_wdf_function_binding,
+    NTSTATUS,
+    STATUS_INVALID_PARAMETER,
+    WDFSPINLOCK,
+    WDF_OBJECT_ATTRIBUTES,
+};
 
 use crate::nt_success;
 
@@ -17,7 +23,10 @@ use crate::nt_success;
 /// callback functions access the space. Before a driver can use a framework
 /// spin lock it must call [`SpinLock::try_new()`] to create a [`SpinLock`]. The
 /// driver can then call [`SpinLock::acquire`] to acquire the lock and
-/// [`SpinLock::release()`] to release it.
+/// [`SpinLock::release()`] to release it. In order to guarantee safety, the
+/// spinlock must be parented to the driver object by default. This is done by
+/// ensuring that the `ParentObject` field of the `WDF_OBJECT_ATTRIBUTES`
+/// parameter is null when calling [`SpinLock::try_new()`].
 pub struct SpinLock {
     wdf_spin_lock: WDFSPINLOCK,
 }
@@ -26,11 +35,22 @@ impl SpinLock {
     ///
     /// # Errors
     ///
-    /// This function will return an error if WDF fails to contruct a timer. The error variant will contain a [`NTSTATUS`] of the failure. Full error documentation is available in the [WDFSpinLock Documentation](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfsync/nf-wdfsync-wdfspinlockcreate#return-value)
+    /// This function will return an error if:
+    /// - the `ParentObject` field of the `WDF_OBJECT_ATTRIBUTES` parameter is
+    ///   not null. This will result in an `NTSTATUS_INVALID_PARAMETER`.
+    /// - WDF fails to contruct a timer. The error variant will contain a
+    ///   [`NTSTATUS`] of the failure. Full error documentation is available in
+    ///   the
+    ///   [WDFSpinLock Documentation](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfsync/nf-wdfsync-wdfspinlockcreate#return-value)
     pub fn try_new(attributes: &mut WDF_OBJECT_ATTRIBUTES) -> Result<Self, NTSTATUS> {
         let mut spin_lock = Self {
             wdf_spin_lock: core::ptr::null_mut(),
         };
+
+        // Return error if parent object is not null
+        if !attributes.ParentObject.is_null() {
+            return Err(STATUS_INVALID_PARAMETER);
+        }
 
         let nt_status;
         // SAFETY: The resulting ffi object is stored in a private member and not
@@ -51,7 +71,10 @@ impl SpinLock {
     ///
     /// # Errors
     ///
-    /// This function will return an error if WDF fails to contruct a timer. The error variant will contain a [`NTSTATUS`] of the failure. Full error documentation is available in the [WDFSpinLock Documentation](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfsync/nf-wdfsync-wdfspinlockcreate#return-value)
+    /// This function will return an error if WDF fails to contruct a timer. The
+    /// error variant will contain a [`NTSTATUS`] of the failure. Full error
+    /// documentation is available in the 
+    /// [WDFSpinLock Documentation](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdfsync/nf-wdfsync-wdfspinlockcreate#return-value)
     pub fn create(attributes: &mut WDF_OBJECT_ATTRIBUTES) -> Result<Self, NTSTATUS> {
         Self::try_new(attributes)
     }
