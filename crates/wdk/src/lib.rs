@@ -5,6 +5,7 @@
 //! built on top of the raw FFI bindings provided by [`wdk_sys`], and provides a
 //! safe, idiomatic rust interface to the WDK.
 
+
 #![cfg_attr(
     any(driver_model__driver_type = "WDM", driver_model__driver_type = "KMDF"),
     no_std
@@ -35,6 +36,7 @@ pub use wdk_sys::PAGED_CODE as paged_code;
     driver_model__driver_type = "UMDF",
 ))]
 mod print;
+pub mod fmt;
 
 #[cfg(any(driver_model__driver_type = "KMDF", driver_model__driver_type = "UMDF"))]
 pub mod wdf;

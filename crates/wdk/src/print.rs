@@ -2,6 +2,7 @@
 // License: MIT OR Apache-2.0
 
 use core::fmt;
+use crate::fmt::WdkFormatBuffer;
 #[cfg(driver_model__driver_type = "UMDF")]
 use std::ffi::CString;
 
@@ -88,13 +89,24 @@ macro_rules! println {
 pub fn _print(args: fmt::Arguments) {
     cfg_if::cfg_if! {
         if #[cfg(any(driver_model__driver_type = "WDM", driver_model__driver_type = "KMDF"))] {
-            let mut buffered_writer = dbg_print_buf_writer::DbgPrintBufWriter::new();
-
+            let mut buffered_writer: WdkFormatBuffer = WdkFormatBuffer::new();
             if fmt::write(&mut buffered_writer, args).is_ok() {
-                buffered_writer.flush();
-            } else {
-                unreachable!("DbgPrintBufWriter should never fail to write");
+
             }
+            else {
+                // todo rewrite this
+                warn!("String too long -- lost data via print")
+            }
+
+            // if fmt::write(&mut buffered_write, args).is_ok()
+
+            // let mut buffered_writer = dbg_print_buf_writer::DbgPrintBufWriter::new();
+
+            // if fmt::write(&mut buffered_writer, args).is_ok() {
+            //     buffered_writer.flush();
+            // } else {
+            //     unreachable!("DbgPrintBufWriter should never fail to write");
+            // }
 
         } else if #[cfg(driver_model__driver_type = "UMDF")] {
             match CString::new(format!("{args}")) {
