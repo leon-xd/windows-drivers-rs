@@ -300,7 +300,7 @@ impl TraitsMap {
     ///
     /// Returns:
     /// - [`TraitsError::Parse`] if `source` is not valid Rust
-    /// - [`TraitsError::UnsupportedSynNodeVariant`] or
+    /// - [`TraitsError::UnsupportedNodeVariant`] or
     ///   [`TraitsError::UnsupportedNodeShape`] if a classified construct does
     ///   not match any recognized bindgen output shape
     /// - [`TraitsError::UnresolvedTypeAlias`] or
