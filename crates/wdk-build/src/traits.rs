@@ -204,7 +204,7 @@ impl TryFrom<Vec<String>> for TraitsSet {
 
     /// Builds a `TraitsSet` from a list of implemented traits.
     ///
-    /// Returns [`TraitsError::UntrackedTraits`] if all traits are not tracked.
+    /// Returns [`TraitsError::UntrackedTraits`] if no traits are tracked.
     fn try_from(trait_names: Vec<String>) -> Result<Self, TraitsError> {
         let mut set = Self::default();
 
@@ -1565,7 +1565,7 @@ mod tests {
         }
 
         #[test]
-        fn str_implements_all_except_copy_and_default() {
+        fn str_implements_all_except_copy() {
             let expected = TraitsSet {
                 copy: false,
                 ..TraitsSet::all()
